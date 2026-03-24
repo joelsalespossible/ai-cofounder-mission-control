@@ -1,78 +1,102 @@
 ---
-name: Self-Improving + Proactive Agent
-slug: self-improving
-version: 1.2.16
-homepage: https://clawic.com/skills/self-improving
-description: "Self-reflection + Self-criticism + Self-learning + Self-organizing memory. Agent evaluates its own work, catches mistakes, and improves permanently. Use when (1) a command, tool, API, or operation fails; (2) the user corrects you or rejects your work; (3) you realize your knowledge is outdated or incorrect; (4) you discover a better approach; (5) the user explicitly installs or references the skill for the current task."
-changelog: "Clarifies the setup flow for proactive follow-through and safer installation behavior."
-metadata: {"clawdbot":{"emoji":"🧠","requires":{"bins":[]},"os":["linux","darwin","win32"],"configPaths":["~/self-improving/"],"configPaths.optional":["./AGENTS.md","./SOUL.md","./HEARTBEAT.md"]}}
+name: self-improving
+description: "Self-reflection, self-criticism, self-learning, and persistent memory with WAL protocol. Agent evaluates its own work, catches mistakes, learns from corrections, and manages tiered memory that compounds execution quality over time. Use when: (1) a command, tool, or operation fails; (2) the user corrects you or rejects your work; (3) you realize your knowledge is outdated or incorrect; (4) you discover a better approach; (5) you complete significant work and want to evaluate the outcome; (6) context persistence and session state management is needed."
 ---
 
-## When to Use
+# Self-Improving Agent
 
-User corrects you or points out mistakes. You complete significant work and want to evaluate the outcome. You notice something in your own output that could be better. Knowledge should compound over time without manual maintenance.
+Self-reflection + correction logging + tiered memory + WAL protocol in one system. No API keys required. File-based. Works with existing OpenClaw memory (MEMORY.md, memory/) without overwriting anything.
 
 ## Architecture
 
-Memory lives in `~/self-improving/` with tiered structure. If `~/self-improving/` does not exist, run `setup.md`.
-Workspace setup should add the standard self-improving steering to the workspace AGENTS, SOUL, and `HEARTBEAT.md` files, with recurring maintenance routed through `heartbeat-rules.md`.
+Two memory systems, complementary — never conflicting:
+
+| System | Location | Purpose |
+|--------|----------|---------|
+| OpenClaw native | MEMORY.md, memory/*.md | Facts, events, decisions, daily logs |
+| Self-improving | ~/self-improving/ | Execution quality: corrections, patterns, preferences |
 
 ```
-~/self-improving/
-├── memory.md          # HOT: ≤100 lines, always loaded
-├── index.md           # Topic index with line counts
-├── heartbeat-state.md # Heartbeat state: last run, reviewed change, action notes
-├── projects/          # Per-project learnings
-├── domains/           # Domain-specific (code, writing, comms)
-├── archive/           # COLD: decayed patterns
-└── corrections.md     # Last 50 corrections log
+Workspace (OpenClaw native — skill never overwrites these):
+├── MEMORY.md               # Long-term curated facts
+├── SESSION-STATE.md         # Hot RAM (WAL protocol)
+└── memory/
+    └── YYYY-MM-DD.md       # Daily logs
+
+~/self-improving/ (this skill manages):
+├── memory.md               # HOT: ≤100 lines, always loaded
+├── index.md                # Topic index with line counts
+├── corrections.md          # Last 50 corrections
+├── heartbeat-state.md      # Maintenance markers
+├── projects/               # Per-project learnings
+├── domains/                # Domain-specific (code, comms, etc.)
+└── archive/                # COLD: decayed patterns
 ```
 
-## Quick Reference
+### Where to store what
 
-| Topic | File |
-|-------|------|
-| Setup guide | `setup.md` |
-| Heartbeat state template | `heartbeat-state.md` |
-| Memory template | `memory-template.md` |
-| Workspace heartbeat snippet | `HEARTBEAT.md` |
-| Heartbeat rules | `heartbeat-rules.md` |
-| Learning mechanics | `learning.md` |
-| Security boundaries | `boundaries.md` |
-| Scaling rules | `scaling.md` |
-| Memory operations | `operations.md` |
-| Self-reflection log | `reflections.md` |
-| OpenClaw HEARTBEAT seed | `openclaw-heartbeat.md` |
+| Content type | Store in |
+|-------------|----------|
+| Facts, events, decisions | MEMORY.md (OpenClaw native) |
+| Daily work log | memory/YYYY-MM-DD.md |
+| Current task + session state | SESSION-STATE.md |
+| Corrections and mistakes | ~/self-improving/corrections.md |
+| Confirmed preferences/rules | ~/self-improving/memory.md |
+| Project-specific patterns | ~/self-improving/projects/{name}.md |
+| Domain patterns (code, comms) | ~/self-improving/domains/{name}.md |
 
-## Requirements
+## WAL Protocol (Write-Ahead Log)
 
-- No credentials required
-- No extra binaries required
-- Optional installation of the `Proactivity` skill may require network access
+**Write state BEFORE responding.** If you crash/compact after responding but before saving, context is lost. WAL prevents this.
+
+| Trigger | Write to | Then |
+|---------|----------|------|
+| User states preference | ~/self-improving/memory.md | Respond |
+| User makes decision | SESSION-STATE.md | Respond |
+| User corrects you | ~/self-improving/corrections.md | Respond |
+| User gives deadline | SESSION-STATE.md | Respond |
+| Significant task completed | memory/YYYY-MM-DD.md | Respond |
+
+## SESSION-STATE.md (Hot RAM)
+
+Lives in workspace root. Survives compaction, restarts, context loss. Read first every session, update every cycle.
+
+```markdown
+# SESSION-STATE.md — Active Working Memory
+
+## Current Task
+[What we're working on RIGHT NOW]
+
+## Key Context
+[Critical facts for current work]
+
+## Pending Actions
+- [ ] ...
+
+## Recent Decisions
+[Decisions made this session]
+
+---
+*Last updated: [timestamp]*
+```
+
+- **Session start:** Read SESSION-STATE.md first
+- **During work:** Update before responding (WAL)
+- **Session end:** Update with final state
 
 ## Learning Signals
 
-Log automatically when you notice these patterns:
+**Log immediately** → corrections.md, evaluate for memory.md:
+- "No, that's not right..." / "Actually, it should be..."
+- "I prefer X, not Y" / "Remember that I always..."
+- "Stop doing X" / "Why do you keep..."
 
-**Corrections** → add to `corrections.md`, evaluate for `memory.md`:
-- "No, that's not right..."
-- "Actually, it should be..."
-- "You're wrong about..."
-- "I prefer X, not Y"
-- "Remember that I always..."
-- "I told you before..."
-- "Stop doing X"
-- "Why do you keep..."
+**Log if explicit** → memory.md:
+- "Always do X for me" / "Never do Y"
+- "My style is..." / "For [project], use..."
 
-**Preference signals** → add to `memory.md` if explicit:
-- "I like when you..."
-- "Always do X for me"
-- "Never do Y"
-- "My style is..."
-- "For [project], use..."
-
-**Pattern candidates** → track, promote after 3x:
-- Same instruction repeated 3+ times
+**Track, promote after 3x:**
+- Same instruction repeated 3+ times → ask to confirm as permanent rule
 - Workflow that works well repeatedly
 - User praises specific approach
 
@@ -80,6 +104,7 @@ Log automatically when you notice these patterns:
 - One-time instructions ("do X now")
 - Context-specific ("in this file...")
 - Hypotheticals ("what if...")
+- Silence (absence of correction ≠ approval)
 
 ## Self-Reflection
 
@@ -87,164 +112,117 @@ After completing significant work, pause and evaluate:
 
 1. **Did it meet expectations?** — Compare outcome vs intent
 2. **What could be better?** — Identify improvements for next time
-3. **Is this a pattern?** — If yes, log to `corrections.md`
+3. **Is this a pattern?** — If yes, log to corrections.md
 
-**When to self-reflect:**
-- After completing a multi-step task
-- After receiving feedback (positive or negative)
-- After fixing a bug or mistake
-- When you notice your output could be better
-
-**Log format:**
 ```
 CONTEXT: [type of task]
 REFLECTION: [what I noticed]
 LESSON: [what to do differently]
 ```
 
-**Example:**
-```
-CONTEXT: Building Flutter UI
-REFLECTION: Spacing looked off, had to redo
-LESSON: Check visual spacing before showing user
+When to self-reflect: after multi-step tasks, after feedback, after fixing mistakes, when output could be better. Entries follow promotion rules: 3x applied successfully → promote to HOT.
+
+## Tiered Memory
+
+| Tier | Location | Limit | Behavior |
+|------|----------|-------|----------|
+| HOT | ~/self-improving/memory.md | ≤100 lines | Always loaded on session start |
+| WARM | projects/, domains/ | ≤200 lines each | Load on context match |
+| COLD | archive/ | Unlimited | Load on explicit query only |
+
+### Promotion & Demotion
+- Pattern used 3x in 7 days → promote to HOT
+- Pattern unused 30 days → demote to WARM
+- Pattern unused 90 days → archive to COLD
+- **Never delete without asking user**
+
+### Conflict Resolution
+1. Most specific wins (project > domain > global)
+2. Most recent wins (same level)
+3. If ambiguous → ask user
+
+## Workspace Integration (Non-Destructive)
+
+**Never overwrite existing files.** Add sections, don't replace.
+
+**SOUL.md** — add:
+```markdown
+**Self-Improving**
+Before non-trivial work, load ~/self-improving/memory.md.
+After corrections or reusable lessons, write one concise entry immediately.
+Prefer learned rules when relevant. Keep self-inferred rules revisable.
 ```
 
-Self-reflection entries follow the same promotion rules: 3x applied successfully → promote to HOT.
+**AGENTS.md** — add to Memory section:
+```markdown
+- **Self-improving:** ~/self-improving/ — execution-quality memory (preferences, patterns, corrections)
+Use MEMORY.md / memory/ for factual continuity. Use ~/self-improving/ for compounding execution quality.
+```
+
+**HEARTBEAT.md** — add:
+```markdown
+## Self-Improving Check
+- Read ./skills/self-improving/heartbeat-rules.md
+- Use ~/self-improving/heartbeat-state.md for run markers
+- If no file in ~/self-improving/ changed since last review, return HEARTBEAT_OK
+```
 
 ## Quick Queries
 
 | User says | Action |
 |-----------|--------|
 | "What do you know about X?" | Search all tiers for X |
-| "What have you learned?" | Show last 10 from `corrections.md` |
-| "Show my patterns" | List `memory.md` (HOT) |
-| "Show [project] patterns" | Load `projects/{name}.md` |
-| "What's in warm storage?" | List files in `projects/` + `domains/` |
+| "What have you learned?" | Show last 10 from corrections.md |
+| "Show my patterns" | List memory.md (HOT) |
+| "Show [project] patterns" | Load projects/{name}.md |
 | "Memory stats" | Show counts per tier |
 | "Forget X" | Remove from all tiers (confirm first) |
-| "Export memory" | ZIP all files |
-
-## Memory Stats
-
-On "memory stats" request, report:
-
-```
-📊 Self-Improving Memory
-
-HOT (always loaded):
-  memory.md: X entries
-
-WARM (load on demand):
-  projects/: X files
-  domains/: X files
-
-COLD (archived):
-  archive/: X files
-
-Recent activity (7 days):
-  Corrections logged: X
-  Promotions to HOT: X
-  Demotions to WARM: X
-```
+| "Forget everything" | Export → wipe → confirm |
 
 ## Common Traps
 
 | Trap | Why It Fails | Better Move |
-|------|--------------|-------------|
-| Learning from silence | Creates false rules | Wait for explicit correction or repeated evidence |
-| Promoting too fast | Pollutes HOT memory | Keep new lessons tentative until repeated |
-| Reading every namespace | Wastes context | Load only HOT plus the smallest matching files |
-| Compaction by deletion | Loses trust and history | Merge, summarize, or demote instead |
+|------|-------------|-------------|
+| Learning from silence | Creates false rules | Wait for explicit correction or 3x evidence |
+| Promoting too fast | Pollutes HOT memory | Keep tentative until confirmed |
+| Reading every namespace | Wastes context | Load only HOT + smallest matching files |
+| Compaction by deletion | Loses trust/history | Merge, summarize, or demote instead |
+| Overwriting workspace files | Destroys existing context | Complement, never replace |
 
-## Core Rules
+## Setup
 
-### 1. Learn from Corrections and Self-Reflection
-- Log when user explicitly corrects you
-- Log when you identify improvements in your own work
-- Never infer from silence alone
-- After 3 identical lessons → ask to confirm as rule
+If `~/self-improving/` does not exist, follow `setup.md`.
 
-### 2. Tiered Storage
-| Tier | Location | Size Limit | Behavior |
-|------|----------|------------|----------|
-| HOT | memory.md | ≤100 lines | Always loaded |
-| WARM | projects/, domains/ | ≤200 lines each | Load on context match |
-| COLD | archive/ | Unlimited | Load on explicit query |
+Quick init:
+```bash
+python3 ./skills/self-improving/scripts/agent_memory.py init
+```
 
-### 3. Automatic Promotion/Demotion
-- Pattern used 3x in 7 days → promote to HOT
-- Pattern unused 30 days → demote to WARM
-- Pattern unused 90 days → archive to COLD
-- Never delete without asking
+Status check:
+```bash
+python3 ./skills/self-improving/scripts/agent_memory.py status
+```
 
-### 4. Namespace Isolation
-- Project patterns stay in `projects/{name}.md`
-- Global preferences in HOT tier (memory.md)
-- Domain patterns (code, writing) in `domains/`
-- Cross-namespace inheritance: global → domain → project
+## References
 
-### 5. Conflict Resolution
-When patterns contradict:
-1. Most specific wins (project > domain > global)
-2. Most recent wins (same level)
-3. If ambiguous → ask user
-
-### 6. Compaction
-When file exceeds limit:
-1. Merge similar corrections into single rule
-2. Archive unused patterns
-3. Summarize verbose entries
-4. Never lose confirmed preferences
-
-### 7. Transparency
-- Every action from memory → cite source: "Using X (from projects/foo.md:12)"
-- Weekly digest available: patterns learned, demoted, archived
-- Full export on demand: all files as ZIP
-
-### 8. Security Boundaries
-See `boundaries.md` — never store credentials, health data, third-party info.
-
-### 9. Graceful Degradation
-If context limit hit:
-1. Load only memory.md (HOT)
-2. Load relevant namespace on demand
-3. Never fail silently — tell user what's not loaded
+- **Learning mechanics**: See `references/learning.md` for trigger classification, confirmation flow, pattern evolution
+- **Security boundaries**: See `references/boundaries.md` for what to never store, consent model, kill switch
+- **Scaling rules**: See `references/scaling.md` for volume thresholds, compaction rules, multi-project patterns
+- **Memory operations**: See `references/operations.md` for automatic operations, file formats, edge cases
+- **Heartbeat rules**: See `heartbeat-rules.md` for recurring maintenance behavior
 
 ## Scope
 
 This skill ONLY:
 - Learns from user corrections and self-reflection
-- Stores preferences in local files (`~/self-improving/`)
-- Maintains heartbeat state in `~/self-improving/heartbeat-state.md` when the workspace integrates heartbeat
-- Reads its own memory files on activation
+- Stores patterns in local files (~/self-improving/)
+- Creates SESSION-STATE.md for session state management
+- Maintains heartbeat state for recurring maintenance
 
 This skill NEVER:
-- Accesses calendar, email, or contacts
-- Makes network requests
-- Reads files outside `~/self-improving/`
+- Overwrites existing MEMORY.md, memory/, AGENTS.md, SOUL.md, HEARTBEAT.md
+- Accesses calendar, email, contacts, or makes network requests
+- Reads files outside ~/self-improving/ and workspace root
 - Infers preferences from silence or observation
-- Deletes or blindly rewrites self-improving memory during heartbeat cleanup
+- Deletes memory without explicit user confirmation
 - Modifies its own SKILL.md
-
-## Data Storage
-
-Local state lives in `~/self-improving/`:
-
-- `memory.md` for HOT rules and confirmed preferences
-- `corrections.md` for explicit corrections and reusable lessons
-- `projects/` and `domains/` for scoped patterns
-- `archive/` for decayed or inactive patterns
-- `heartbeat-state.md` for recurring maintenance markers
-
-## Related Skills
-Install with `clawhub install <slug>` if user confirms:
-
-- `memory` — Long-term memory patterns for agents
-- `learning` — Adaptive teaching and explanation
-- `decide` — Auto-learn decision patterns
-- `escalate` — Know when to ask vs act autonomously
-
-## Feedback
-
-- If useful: `clawhub star self-improving`
-- Stay updated: `clawhub sync`

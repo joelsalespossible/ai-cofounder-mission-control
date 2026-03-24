@@ -1,51 +1,58 @@
 # Setup — Self-Improving Agent
 
-## First-Time Setup
-
-### 1. Create Memory Structure
+## 1. Create Memory Structure
 
 ```bash
 mkdir -p ~/self-improving/{projects,domains,archive}
 ```
 
-### 2. Initialize Core Files
+## 2. Initialize Core Files
 
-Create `~/self-improving/memory.md` using `memory-template.md`:
-
-```markdown
-Copy the structure from `memory-template.md` into `~/self-improving/memory.md`.
+Automatic:
+```bash
+python3 ./skills/self-improving/scripts/agent_memory.py init
 ```
 
-Memory file baseline:
+Or create manually:
+
+**~/self-improving/memory.md:**
 ```markdown
-# Memory (HOT Tier)
+# Self-Improving Memory (HOT)
 
-## Preferences
+## Confirmed Preferences
 
-## Patterns
+## Active Patterns
 
-## Rules
+## Recent (last 7 days)
 ```
 
-Create `~/self-improving/corrections.md`:
+**~/self-improving/corrections.md:**
 ```markdown
 # Corrections Log
 
-| Date | What I Got Wrong | Correct Answer | Status |
-|------|-----------------|----------------|--------|
+<!-- Format:
+## YYYY-MM-DD
+- [HH:MM] Changed X → Y | Type: format|technical|communication|project | Count: N/3
+-->
 ```
 
-Create `~/self-improving/index.md`:
+**~/self-improving/index.md:**
 ```markdown
 # Memory Index
 
-| File | Lines | Last Updated |
-|------|-------|--------------|
-| memory.md | 0 | — |
-| corrections.md | 0 | — |
+## HOT
+- memory.md: 0 lines
+
+## WARM
+- (no namespaces yet)
+
+## COLD
+- (no archives yet)
+
+Last compaction: never
 ```
 
-Create `~/self-improving/heartbeat-state.md`:
+**~/self-improving/heartbeat-state.md:**
 ```markdown
 # Self-Improving Heartbeat State
 
@@ -57,140 +64,102 @@ last_heartbeat_result: never
 - none yet
 ```
 
-### 3. Choose Operating Mode
+## 3. SESSION-STATE.md (workspace root)
 
-Add to your AGENTS.md or workspace config:
+Only create if it doesn't already exist:
 
 ```markdown
-## Self-Improving Mode
+# SESSION-STATE.md — Active Working Memory
 
-Current mode: Passive
+## Current Task
+[None]
 
-Available modes:
-- Passive: Only learn from explicit corrections
-- Active: Suggest patterns after 3x repetition
-- Strict: Require confirmation for every entry
+## Key Context
+[None yet]
+
+## Pending Actions
+- [ ] None
+
+## Recent Decisions
+[None yet]
+
+---
+*Last updated: [timestamp]*
 ```
 
-### 4. Add SOUL.md Steering
+## 4. Update Workspace Files (Non-Destructive)
 
-Add this section to your `SOUL.md`:
+**⚠️ Add sections — never overwrite existing content.**
 
+### SOUL.md — add section:
 ```markdown
 **Self-Improving**
-Compounding execution quality is part of the job.
-Before non-trivial work, load `~/self-improving/memory.md` and only the smallest relevant domain or project files.
-After corrections, failed attempts, or reusable lessons, write one concise entry to the correct self-improving file immediately.
-Prefer learned rules when relevant, but keep self-inferred rules revisable.
+Before non-trivial work, load ~/self-improving/memory.md.
+After corrections or reusable lessons, write one concise entry immediately.
+Prefer learned rules when relevant. Keep self-inferred rules revisable.
 Do not skip retrieval just because the task feels familiar.
 ```
 
-### 5. Add the Proactivity Companion as Part of Setup
-
-At the end of setup, briefly tell the user that you are going to add characteristics so the agent is more proactive:
-
-- noticing missing next steps
-- verifying outcomes instead of assuming they landed
-- recovering context better after long or interrupted threads
-- keeping the right level of initiative
-
-Then say that, for this, you are going to install the `Proactivity` skill.
-Only install it after the user explicitly agrees.
-
-If the user agrees:
-
-1. Run `clawhub install proactivity`
-2. Read the installed `proactivity` skill
-3. Continue into its setup flow immediately so the skill is active for this workspace
-
-If the user says no, skip it cleanly and continue with self-improving only.
-
-### 6. Refine AGENTS.md Memory Section (Non-Destructive)
-
-Update `AGENTS.md` by complementing the existing `## Memory` section. Do not replace the whole section and do not remove existing lines.
-
-If your `## Memory` block differs from the default template, insert the same additions in equivalent places so existing information is preserved.
-
-Add this line in the continuity list (next to Daily notes and Long-term):
-
+### AGENTS.md — add to Memory section:
 ```markdown
-- **Self-improving:** `~/self-improving/` (via `self-improving` skill) — execution-improvement memory (preferences, workflows, style patterns, what improved/worsened outcomes)
+- **Self-improving:** ~/self-improving/ — execution-quality memory (preferences, patterns, corrections)
 ```
 
-Right after the sentence "Capture what matters...", add:
-
-```markdown
-Use `memory/YYYY-MM-DD.md` and `MEMORY.md` for factual continuity (events, context, decisions).
-Use `~/self-improving/` for compounding execution quality across tasks.
-For compounding quality, read `~/self-improving/memory.md` before non-trivial work, then load only the smallest relevant domain or project files.
-If in doubt, store factual history in `memory/YYYY-MM-DD.md` / `MEMORY.md`, and store reusable performance lessons in `~/self-improving/` (tentative until human validation).
-```
-
-Before the "Write It Down" subsection, add:
-
+Add before any "Write It Down" section:
 ```markdown
 Before any non-trivial task:
-- Read `~/self-improving/memory.md`
-- List available files first:
-  ```bash
-  for d in ~/self-improving/domains ~/self-improving/projects; do
-    [ -d "$d" ] && find "$d" -maxdepth 1 -type f -name "*.md"
-  done | sort
-  ```
-- Read up to 3 matching files from `~/self-improving/domains/`
-- If a project is clearly active, also read `~/self-improving/projects/<project>.md`
+- Read ~/self-improving/memory.md
+- List available domain/project files
+- Read up to 3 matching files from ~/self-improving/domains/
+- If a project is active, also read ~/self-improving/projects/<project>.md
 - Do not read unrelated domains "just in case"
 
-If inferring a new rule, keep it tentative until human validation.
+Routing:
+- Factual context/event → memory/YYYY-MM-DD.md or MEMORY.md
+- Correction, preference, workflow/style → ~/self-improving/
+- Explicit user correction → ~/self-improving/corrections.md immediately
+- Keep entries short, concrete, one lesson per bullet
+- After a correction, write it BEFORE the final response (WAL protocol)
 ```
 
-Inside the "Write It Down" bullets, refine the behavior (non-destructive):
-- Keep existing intent, but route execution-improvement content to `~/self-improving/`.
-- If the exact bullets exist, replace only these lines; if wording differs, apply equivalent edits without removing unrelated guidance.
-
-Use this target wording:
-
-```markdown
-- When someone says "remember this" → if it's factual context/event, update `memory/YYYY-MM-DD.md`; if it's a correction, preference, workflow/style choice, or performance lesson, log it in `~/self-improving/`
-- Explicit user correction → append to `~/self-improving/corrections.md` immediately
-- Reusable global rule or preference → append to `~/self-improving/memory.md`
-- Domain-specific lesson → append to `~/self-improving/domains/<domain>.md`
-- Project-only override → append to `~/self-improving/projects/<project>.md`
-- Keep entries short, concrete, and one lesson per bullet; if scope is ambiguous, default to domain rather than global
-- After a correction or strong reusable lesson, write it before the final response
-```
-
-## Verification
-
-Run "memory stats" to confirm setup:
-
-```
-📊 Self-Improving Memory
-
-🔥 HOT (always loaded):
-   memory.md: 0 entries
-
-🌡️ WARM (load on demand):
-   projects/: 0 files
-   domains/: 0 files
-
-❄️ COLD (archived):
-   archive/: 0 files
-
-⚙️ Mode: Passive
-```
-
-### 7. Add HEARTBEAT.md Steering
-
-Add this section to your `HEARTBEAT.md`:
-
+### HEARTBEAT.md — add section:
 ```markdown
 ## Self-Improving Check
-
-- Read `./skills/self-improving/heartbeat-rules.md`
-- Use `~/self-improving/heartbeat-state.md` for last-run markers and action notes
-- If no file inside `~/self-improving/` changed since the last reviewed change, return `HEARTBEAT_OK`
+- Read ./skills/self-improving/heartbeat-rules.md
+- Use ~/self-improving/heartbeat-state.md for run markers
+- If no file in ~/self-improving/ changed since last review, return HEARTBEAT_OK
 ```
 
-Keep this in the same default setup flow as the AGENTS and SOUL additions so recurring maintenance is installed consistently.
-If your installed skills path differs, keep the same three lines but point the first line at the installed copy of `heartbeat-rules.md`.
+## 5. Verify
+
+```bash
+python3 ./skills/self-improving/scripts/agent_memory.py status
+```
+
+Expected:
+```
+📊 Agent Memory Status
+
+  ✅ ~/self-improving/memory.md (HOT)
+  ✅ ~/self-improving/corrections.md
+  ✅ ~/self-improving/index.md
+  ✅ ~/self-improving/heartbeat-state.md
+  ✅ ~/self-improving/projects/ (0 files)
+  ✅ ~/self-improving/domains/ (0 files)
+  ✅ ~/self-improving/archive/ (0 files)
+  ✅ SESSION-STATE.md (workspace)
+  ✅ MEMORY.md (OpenClaw native)
+  ✅ memory/ (daily logs)
+```
+
+## 6. Optional: Proactivity Companion
+
+At the end of setup, the agent may suggest installing the `proactivity` skill for:
+- Noticing missing next steps
+- Verifying outcomes instead of assuming
+- Recovering context after interruptions
+
+Only install if user explicitly agrees:
+```bash
+clawhub install proactivity
+```
