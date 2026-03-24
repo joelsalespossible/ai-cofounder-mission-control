@@ -13,6 +13,12 @@ Run: `node /tmp/ws/orchestrator.mjs inbox`
 - Only reach out if something important needs attention
 - Stay quiet 11 PM - 8 AM EST unless urgent
 
+## Self-Improving Check
+
+- Read `./skills/self-improving/heartbeat-rules.md`
+- Use `~/self-improving/heartbeat-state.md` for last-run markers and action notes
+- If no file inside `~/self-improving/` changed since the last reviewed change, return `HEARTBEAT_OK`
+
 ## Proactive Work (During heartbeats)
 - Review and update MEMORY.md every few days
 - Commit workspace changes
