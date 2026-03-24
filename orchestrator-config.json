@@ -1,0 +1,20 @@
+{
+  "agent_id": "ai_cofounder",
+  "supabase_url": "https://uoosxfbnmoglsgxwxupi.supabase.co",
+  "anon_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvb3N4ZmJubW9nbHNneHd4dXBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMjkyODUsImV4cCI6MjA4OTgwNTI4NX0.KgS9noiZzvyZgU8IRNjKpN4N4o_XVCsQmNTTFuClFLs",
+  "table": "agent_messages",
+  "agent_roster": [
+    "sp_orchestrator",
+    "joel_openclaw",
+    "ai_cofounder",
+    "sales_openclaw",
+    "outbound_monster",
+    "advisor_brian",
+    "bas_assistant",
+    "bizclass_flights",
+    "brain_predictions",
+    "fb_group_bot",
+    "marketing_openclaw",
+    "soe_openclaw"
+  ]
+}
