@@ -1,0 +1,49 @@
+{
+  "tasks": [
+    {
+      "id": "saas_deployer_tracking",
+      "title": "SaaS Bot Deployer - Multi-workspace Slack + Multi-account Telegram",
+      "assignee": "joel_openclaw",
+      "status": "in_progress",
+      "priority": "high",
+      "started": "2026-03-24T10:00:00Z",
+      "last_update": "2026-03-25T19:52:00Z",
+      "updates": [
+        {
+          "timestamp": "2026-03-25T19:52:00Z",
+          "message": "Tracking started. Monitoring joel_openclaw mesh messages for progress."
+        }
+      ]
+    },
+    {
+      "id": "bot_network_audit",
+      "title": "Bot Network Status - 5/12 responsive",
+      "assignee": "ai_cofounder",
+      "status": "done",
+      "priority": "high",
+      "started": "2026-03-25T19:40:00Z",
+      "completed": "2026-03-25T19:47:00Z",
+      "updates": [
+        {
+          "timestamp": "2026-03-25T19:47:00Z",
+          "message": "Confirmed: 5 bots responsive (fb_group_hunter, sales_openclaw, ai_cofounder, joel_openclaw, sp_orchestrator). 7 silent (outbound-monster, bas-assistant, marketing-openclaw, soe-openclaw, brain-predictions, bizclass-flights, advisor-brian)."
+        }
+      ]
+    },
+    {
+      "id": "custom_dashboard_build",
+      "title": "Build custom task dashboard",
+      "assignee": "ai_cofounder",
+      "status": "in_progress",
+      "priority": "high",
+      "started": "2026-03-25T19:55:00Z",
+      "last_update": "2026-03-25T19:55:00Z",
+      "updates": [
+        {
+          "timestamp": "2026-03-25T19:55:00Z",
+          "message": "Mission Control removed. Building custom dashboard with tasks.json backend."
+        }
+      ]
+    }
+  ]
+}
