@@ -8,7 +8,7 @@
       "project": "guides",
       "tags": ["guide", "setup"],
       "subtasks": [
-        { "id": "sub_001", "title": "1. Enable GitHub Pages: Settings → Pages → Branch: main → Save", "done": false },
+        { "id": "sub_001", "title": "1. Enable GitHub Pages: Settings → Pages → Branch: main → Save", "done": true },
         { "id": "sub_002", "title": "2. Create GitHub Token: github.com/settings/tokens → Generate (classic) → Scope: repo", "done": false },
         { "id": "sub_003", "title": "3. Connect Dashboard: Open your GitHub Pages URL → Click 'Connect GitHub' → Paste token", "done": false },
         { "id": "sub_004", "title": "4. Install Tailscale: brew install tailscale && tailscale up", "done": false },
@@ -80,29 +80,85 @@
       "createdAt": "2026-01-01T00:00:01Z"
     },
     {
-      "id": "task_example",
-      "title": "Example Task — Delete me when ready!",
-      "description": "This is an example of what a real task looks like. Feel free to edit or delete it.\n\n**Good task descriptions include:**\n- What needs to be done\n- Why it matters\n- Any constraints or requirements\n- Links to relevant resources",
-      "status": "backlog",
-      "project": "default",
-      "tags": ["example"],
+      "id": "task_bot_network_status",
+      "title": "Track bot network status (5 responsive, 7 silent)",
+      "description": "Confirmed 5/12 bots are responsive on mesh:\n- fb_group_hunter\n- sales_openclaw\n- ai_cofounder\n- joel_openclaw\n- sp_orchestrator\n\n7 bots registered but silent:\n- outbound-monster, bas-assistant, marketing-openclaw, soe-openclaw, brain-predictions, bizclass-flights, advisor-brian\n\nNext: coordinate with SP Orchestrator to onboard silent bots.",
+      "status": "done",
+      "project": "network",
+      "tags": ["bot-network", "coordination"],
       "subtasks": [
-        { "id": "sub_001", "title": "First step of the task", "done": false },
-        { "id": "sub_002", "title": "Second step", "done": false },
-        { "id": "sub_003", "title": "Final step", "done": false }
+        { "id": "sub_001", "title": "Check agent_messages for active bots", "done": true },
+        { "id": "sub_002", "title": "Update TOOLS.md with accurate count", "done": true },
+        { "id": "sub_003", "title": "Report to Joel", "done": true }
       ],
-      "priority": "low",
-      "comments": [],
-      "createdAt": "2026-01-01T00:00:02Z"
+      "priority": "high",
+      "comments": [
+        {
+          "author": "AI Co-Founder",
+          "text": "Verified via agent_messages table. 5 bots have sent messages in last 48h.",
+          "timestamp": "2026-03-25T19:47:00Z"
+        }
+      ],
+      "createdAt": "2026-03-25T19:47:00Z"
+    },
+    {
+      "id": "task_saas_deployer_tracking",
+      "title": "Track SaaS Bot Deployer build (joel_openclaw)",
+      "description": "Joel OpenClaw is building multi-workspace Slack + multi-account Telegram support for the SaaS Bot Deployer.\n\nStarted: 2026-03-24 morning\nStatus: In progress\nAssignee: joel_openclaw\n\nCheck mesh messages for updates every heartbeat.",
+      "status": "in_progress",
+      "project": "builds",
+      "tags": ["saas-deployer", "joel_openclaw"],
+      "subtasks": [
+        { "id": "sub_001", "title": "Monitor joel_openclaw messages for progress", "done": false },
+        { "id": "sub_002", "title": "Post updates to #ai-co-founder when status changes", "done": false },
+        { "id": "sub_003", "title": "Track completion and test deployment", "done": false }
+      ],
+      "priority": "high",
+      "comments": [
+        {
+          "author": "AI Co-Founder",
+          "text": "Started tracking. Will check mesh inbox every heartbeat for updates.",
+          "timestamp": "2026-03-25T19:52:00Z"
+        }
+      ],
+      "createdAt": "2026-03-25T19:52:00Z"
+    },
+    {
+      "id": "task_mission_control_setup",
+      "title": "Set up Mission Control dashboard",
+      "description": "Install and configure Mission Control for task tracking.\n\nDashboard: https://joelsalespossible.github.io/ai-cofounder-mission-control/\n\nRemaining setup:\n- GitHub token for dashboard\n- Tailscale Funnel for webhook\n- Webhook configuration",
+      "status": "in_progress",
+      "project": "infrastructure",
+      "tags": ["mission-control", "setup"],
+      "subtasks": [
+        { "id": "sub_001", "title": "Install Mission Control skill", "done": true },
+        { "id": "sub_002", "title": "Enable GitHub Pages", "done": true },
+        { "id": "sub_003", "title": "Create tracking tasks for current work", "done": true },
+        { "id": "sub_004", "title": "GitHub token setup (requires Joel)", "done": false },
+        { "id": "sub_005", "title": "Tailscale Funnel setup (requires Joel)", "done": false },
+        { "id": "sub_006", "title": "Webhook configuration (requires Joel)", "done": false }
+      ],
+      "priority": "high",
+      "comments": [
+        {
+          "author": "AI Co-Founder",
+          "text": "Dashboard is live. Remaining steps require Joel's input/access.",
+          "timestamp": "2026-03-25T19:52:00Z"
+        }
+      ],
+      "createdAt": "2026-03-25T19:52:00Z"
     }
   ],
   "projects": [
     { "id": "guides", "name": "Guides", "color": "#10b981", "icon": "📚" },
-    { "id": "default", "name": "My Project", "color": "#3b82f6", "icon": "📁" }
+    { "id": "network", "name": "Bot Network", "color": "#3b82f6", "icon": "🤖" },
+    { "id": "builds", "name": "Active Builds", "color": "#f59e0b", "icon": "🔨" },
+    { "id": "infrastructure", "name": "Infrastructure", "color": "#8b5cf6", "icon": "⚙️" }
   ],
   "activities": [
-    { "type": "created", "actor": "Mission Control", "task": "Onboarding Guide", "time": "just now" },
-    { "type": "created", "actor": "Mission Control", "task": "User Guide", "time": "just now" }
+    { "type": "created", "actor": "AI Co-Founder", "task": "Mission Control setup", "time": "just now" },
+    { "type": "created", "actor": "AI Co-Founder", "task": "SaaS Deployer tracking", "time": "just now" },
+    { "type": "created", "actor": "AI Co-Founder", "task": "Bot network status", "time": "just now" }
   ],
-  "lastUpdated": "2026-01-01T00:00:00Z"
+  "lastUpdated": "2026-03-25T19:52:00Z"
 }
