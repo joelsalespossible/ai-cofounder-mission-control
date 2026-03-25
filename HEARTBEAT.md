@@ -1,30 +1,40 @@
 # Heartbeat Checklist
 
-## Mesh Inbox Check
-Run `bash scripts/mesh-poll.sh` — if there are unread messages, read them and respond via: `bash scripts/mesh-send.sh <agent_id> "<your reply>"`. Known agents: sp_orchestrator, joel_openclaw, sales_openclaw, outbound_monster.
+## 1. Check SaaS Deployment Updates
 
-IMPORTANT ANTI-SPAM RULE: Before sending ANY mesh message, first check if you have unread outbound messages to that agent that haven't been replied to. Run: curl -s "https://uoosxfbnmoglsgxwxupi.supabase.co/rest/v1/agent_messages?from_agent=eq.ai_cofounder&to_agent=eq.joel_openclaw&status=eq.unread&limit=1" with the apikey headers. If there are ANY unread messages you already sent, DO NOT send another one. Wait for a reply first.
+**Check joel_openclaw messages for progress:**
 
-## Orchestrator Inbox (Every heartbeat)
-- Check for unread messages from other bots
-- Process and respond to any requests
-- Mark messages as read after handling
-- **Active build tracking:** Check in with Joel Openclaw on SaaS deployment progress until shipped
+```bash
+curl -s "https://uoosxfbnmoglsgxwxupi.supabase.co/rest/v1/agent_messages?from_agent=eq.joel_openclaw&to_agent=eq.ai_cofounder&order=created_at.desc&limit=30" \
+  -H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvb3N4ZmJubW9nbHNneHd4dXBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMjkyODUsImV4cCI6MjA4OTgwNTI4NX0.KgS9noiZzvyZgU8IRNjKpN4N4o_XVCsQmNTTFuClFLs" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvb3N4ZmJubW9nbHNneHd4dXBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMjkyODUsImV4cCI6MjA4OTgwNTI4NX0.KgS9noiZzvyZgU8IRNjKpN4N4o_XVCsQmNTTFuClFLs"
+```
 
-Run: `node /tmp/ws/orchestrator.mjs inbox`
+If new updates found → update `tasks.json` with latest status, commit & push.
 
-## Periodic Checks (Rotate 2-4x per day)
-- Track last check timestamps in `memory/heartbeat-state.json`
-- Only reach out if something important needs attention
-- Stay quiet 11 PM - 8 AM EST unless urgent
+## 2. Check Mesh Inbox
 
-## Self-Improving Check
+```bash
+node /tmp/ws/orchestrator.mjs inbox
+```
+
+Process any unread messages, respond as needed, mark as read.
+
+## 3. Update Task Dashboard
+
+**After ANY task progress:**
+1. Update `tasks.json` with new status/updates
+2. Commit and push: `git add tasks.json && git commit -m "Update task: [task_id]" && git push`
+3. Dashboard auto-refreshes every 30 seconds
+
+**Dashboard URL:** https://joelsalespossible.github.io/ai-cofounder-mission-control/
+
+## 4. Self-Improving Check
 
 - Read `./skills/self-improving/heartbeat-rules.md`
-- Use `~/self-improving/heartbeat-state.md` for last-run markers and action notes
-- If no file inside `~/self-improving/` changed since the last reviewed change, return `HEARTBEAT_OK`
+- Use `~/self-improving/heartbeat-state.md` for last-run markers
+- **After ANY mistake or correction: log to ~/self-improving/corrections.md immediately**
 
-## Proactive Work (During heartbeats)
-- Review and update MEMORY.md every few days
-- Commit workspace changes
-- Check on active projects
+---
+
+**Task tracking is MANDATORY. Every heartbeat: check for updates, update tasks.json, commit & push.**
