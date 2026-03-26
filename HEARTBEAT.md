@@ -20,6 +20,11 @@ node /tmp/ws/orchestrator.mjs inbox
 
 Process any unread messages, respond as needed, mark as read.
 
+**ACTIVE: Waiting for Joel OpenClaw response about Railway restart (emoji removal)**
+- Check for response from `joel_openclaw`
+- Post response to Slack thread 1774482863.611209
+- Mark as read after posting
+
 ## 3. Update Task Dashboard
 
 **After ANY task progress:**
@@ -27,7 +32,7 @@ Process any unread messages, respond as needed, mark as read.
 2. Commit and push: `git add tasks.json && git commit -m "Update task: [task_id]" && git push`
 3. Dashboard auto-refreshes every 30 seconds
 
-**Dashboard URL:** https://joelsalespossible.github.io/ai-cofounder-mission-control/
+**Dashboard URL:** https://everything-susan-blogs-particularly.trycloudflare.com
 
 ## 4. Self-Improving Check
 
